@@ -1,106 +1,76 @@
-var numberButtons = document.getElementsByClassName('number'),
-	ops = document.getElementsByClassName('operation'),
-	resultButton = document.getElementsByClassName('result')[0],
-	workField = document.getElementsByClassName('workfield')[0],
-	currentResult = 0,
-	operationFlag = false,
-	lastOperation,
-	// firstOperation = true;
-	lastOperand;
-calcs = document.getElementsByClassName('calculations')[0];
-currentText = workField.value;
-for (var number of numberButtons){
-	number.addEventListener('click', function(){
-		if (operationFlag) {
-			operationFlag = false;
-			workField.value = '';
-			console.log(currentResult);
-			workField.value = workField.value + this.innerHTML;
-		} else {
-			workField.value = workField.value + this.innerHTML;
-			console.log(currentResult);
-		}          
-	});
-};
-				
-for (var op of ops) {
-	op.addEventListener('click', function() {
-		if (!operationFlag) {
-			operationFlag = true;
-		}
-		
-		if (calcs.value == '') {
+const numberButtons = document.querySelectorAll('.number');
+const operationButtons = document.querySelectorAll('.operation');
+const resultButton = document.querySelector('.result');
+const workField = document.querySelector('.workfield');
+const calcs = document.querySelector('.calculations');
+let currentResult = 0;
+let isSecondOperand = false;
+let Calculate = () => {
+	let firstOperand, secondOperand, operationType;
+	let operationsArray = Array.from(operationButtons);
+	let numArr = Array.from(numberButtons);
+	let result;
+	let hasWorkfieldNumbers = false;
+	const inputOperand = () => {
+		if (!isSecondOperand) {
 			firstOperand = +workField.value;
-			
+			isSecondOperand = true;
+			hasWorkfieldNumbers = true;
 		} else {
-			lastOperand = +workField.value;
-			
+			secondOperand = +workField.value;
 		}
-		switch (this.dataset.operation) {
+	}
+	for (num of numArr) {
+		num.addEventListener('click', function() {
+			typeNumber(this);
+		});
+	};
+	const typeNumber = (numberBtn) => {
+		if (workField.value == 0 || workField.value == firstOperand) {
+			workField.value = '';
+		}
+		workField.value = workField.value + numberBtn.innerText;
+	}
+			
+	const getResult = () => {
+		inputOperand();
+		switch (operationType) {
 			case '+' : {
-				currentResult += firstOperand;
-				console.log(currentResult);
-				if (calcs.value == '') {
-					workField.value = firstOperand;
-				} else {
-					workField.value = currentResult;
-				}
-				if (calcs.value == '') {
-					calcs.value = calcs.value + firstOperand;
-				} else {
-					calcs.value = calcs.value + lastOperand;
-				}
-				calcs.value = calcs.value + ' + ';
-				
+				result = firstOperand + secondOperand;
 			}
 			break;
 			case '-' : {
-				currentResult -= firstOperand;
-				console.log(calcs.value);
-				if (calcs.value == '') {
-					workField.value = firstOperand;
-				} else {
-					workField.value = currentResult;
-				};
-				if (calcs.value == '') {
-					calcs.value = calcs.value + firstOperand;
-				} else {
-					calcs.value = calcs.value + lastOperand;
-				}
-				calcs.value = calcs.value + ' - ';
-				console.log(currentResult);
+				result = firstOperand - secondOperand;
 			}
 			break;
-		};
-		
-		lastOperation = this.dataset.operation;
-	});
-};
-				
-resultButton.addEventListener('click', function() {
-	console.log(lastOperand);
-	calcs.value = '';
-	switch (lastOperation) {
-		case '+': {
-			lastOperand = +workField.value;
-			currentResult += lastOperand;
-			workField.value = currentResult;
-			console.log(lastOperand);
+			case '*' : {
+				result = firstOperand * secondOperand;
+			}
+			break;
+			case '/' : {
+				if (secondOperand === 0) {
+					result = 'Infinity';
+				}
+				result = firstOperand / secondOperand;
+			}
+			break;
 		}
-		break;
-		case '-': {
-			lastOperand = +workField.value;
-			currentResult -= firstOperand;
-			workField.value = currentResult;
-			console.log(firstOperand);
-		}
-		break;
-		case '=': {
-			currentResult += lastOperand;
-			workField.value = currentResult;
-			console.log(firstOperand);
-		}
-		break;
+		return result;
+	};
+
+	for (operation of operationsArray) {
+		operation.addEventListener('click', function() {
+			inputOperand();
+			operationType = this.dataset.operation;
+		});
 	}
-	lastOperation = '=';
-});
+		resultButton.addEventListener('click', function() {
+			getResult();
+			isSecondOperand = false;
+			workField.value = result;
+		});
+		
+	
+}
+
+Calculate();
