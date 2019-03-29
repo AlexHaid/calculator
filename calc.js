@@ -2,75 +2,69 @@ const numberButtons = document.querySelectorAll('.number');
 const operationButtons = document.querySelectorAll('.operation');
 const resultButton = document.querySelector('.result');
 const workField = document.querySelector('.workfield');
-const calcs = document.querySelector('.calculations');
-let currentResult = 0;
 let isSecondOperand = false;
-let Calculate = () => {
-	let firstOperand, secondOperand, operationType;
-	let operationsArray = Array.from(operationButtons);
-	let numArr = Array.from(numberButtons);
-	let result;
-	let hasWorkfieldNumbers = false;
+const calculate = () => {
+	let firstOperand = null;
+	let secondOperand = null;
+	let operationType = null;
+	let result = null;
+	let {value} = workField;
+
 	const inputOperand = () => {
 		if (!isSecondOperand) {
-			firstOperand = +workField.value;
+			firstOperand = +value;
 			isSecondOperand = true;
-			hasWorkfieldNumbers = true;
 		} else {
-			secondOperand = +workField.value;
+			secondOperand = +value;
 		}
 	}
-	for (num of numArr) {
-		num.addEventListener('click', function() {
-			typeNumber(this);
-		});
+
+	const typeNumber = (event) => {
+		const isFirstOperand = !+value || value == firstOperand;
+		let {target: {innerText}} = event;
+		value = !isFirstOperand ? value + innerText : '' + innerText;
+		workField.value = value;		
 	};
-	const typeNumber = (numberBtn) => {
-		if (workField.value == 0 || workField.value == firstOperand) {
-			workField.value = '';
-		}
-		workField.value = workField.value + numberBtn.innerText;
-	}
-			
+
+	numberButtons.forEach((num) => { 
+		num.addEventListener('click', typeNumber);
+	});
+
 	const getResult = () => {
 		inputOperand();
 		switch (operationType) {
-			case '+' : {
-				result = firstOperand + secondOperand;
-			}
-			break;
-			case '-' : {
+			case '+' : 
+				result = firstOperand + secondOperand;	
+				break;
+			case '-' : 
 				result = firstOperand - secondOperand;
-			}
-			break;
-			case '*' : {
+				break;
+			case '*' : 
 				result = firstOperand * secondOperand;
-			}
-			break;
-			case '/' : {
-				if (secondOperand === 0) {
-					result = 'Infinity';
-				}
+				break;
+			case '/' : 
 				result = firstOperand / secondOperand;
-			}
-			break;
+				break;
+			default:
+				result = 'Error!';
 		}
-		return result;
+		return result;	
 	};
-
-	for (operation of operationsArray) {
-		operation.addEventListener('click', function() {
-			inputOperand();
-			operationType = this.dataset.operation;
-		});
+	const registerOperand = () => {
+		inputOperand();
+		let {target: {dataset: {operation}}} = event;
+		operationType = event.target.dataset.operation;
 	}
-		resultButton.addEventListener('click', function() {
-			getResult();
-			isSecondOperand = false;
-			workField.value = result;
-		});
-		
-	
+ 	operationButtons.forEach(operation => {
+		operation.addEventListener('click', registerOperand);	
+	});
+
+	const formResult = () => {
+		getResult();
+		isSecondOperand = false;
+		workField.value = value = result;
+	}
+	resultButton.addEventListener('click', formResult);
 }
 
-Calculate();
+calculate();
