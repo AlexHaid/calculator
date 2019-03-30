@@ -2,13 +2,13 @@ html, body {
 	box-sizing: border-box;
 }
 
-.calculator-form {
+.calculator {
 	margin: auto;
 	max-width: 150px;
 	width: 100%;
 }
 
-.calculator-form input {
+.calculator input {
 	width: 100%;
 	margin: 10px 0;
 	outline: none;
@@ -16,17 +16,13 @@ html, body {
 }
 
 .buttons-container {
-	max-width: 300px;
-	width: 100%;
-	margin: auto;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
+	display: grid;
+	grid-template-rows: repeat(5, 1fr);
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 10px;
 }
 
 .buttons-container button {
-	width: calc(33% - 10px);
-	margin: 0 5px 10px 5px;
 	background: linear-gradient(to bottom, #d6de85, #d3ecb6);
 	border: 2px solid transparent;
 	outline: none;
@@ -34,15 +30,5 @@ html, body {
 
 .buttons-container button:hover {
 	transition: opacity, ease, 0.3s;
-	opacity: 0.2;
-}
-
-.buttons-container button:nth-child(3n+1) {
-	margin-left: 0;
-	margin-right: 5px;
-}
-
-.buttons-container button:nth-child(3n) {
-	margin-right: 0;
-	margin-left: 5px;
+	opacity: 0.6;
 }
