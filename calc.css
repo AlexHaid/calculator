@@ -32,3 +32,8 @@ html, body {
 	transition: opacity, ease, 0.3s;
 	opacity: 0.6;
 }
+
+.calculator__inputfield {
+	background-color: #fff;
+	border: 1px solid darkgrey;
+}

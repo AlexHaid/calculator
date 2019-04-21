@@ -1,149 +1,89 @@
-const numberButtons = document.querySelectorAll('.buttons-container__number');
-const operationButtons = document.querySelectorAll('.buttons-container__operation');
-const resultButton = document.querySelector('.buttons-container__result');
-const workField = document.querySelector('.calculator__workfield');
-const plusMinus = document.querySelector('.buttons-container__change-sign');
-const clearButton = document.querySelector('.buttons-container__clear-current');
-const clearAllButton = document.querySelector('.buttons-container__clear-all');
-let isSecondOperand = false;
-let {value} = workField;
-let firstNumber = null;
-let secondNumber = null;
-let operationType = null;
-let result = null;
-let isFirstDigit = true;
-let isFirstNumberPriority = true;
+const initCalculator = () => {	
+	const numberButtons = document.querySelectorAll('.buttons-container__number');
+	const operationButtons = document.querySelectorAll('.buttons-container__operation');
+	const resultButton = document.querySelector('.buttons-container__result');
+	const inputField = document.querySelector('.calculator__inputfield');
+	const plusMinus = document.querySelector('.buttons-container__change-sign');
+	const clearButton = document.querySelector('.buttons-container__clear-current');
+	const clearAllButton = document.querySelector('.buttons-container__clear-all');
 
-const getDigit = (event) => {
-	let {target: {innerText}} = event;
-	let digit = innerText;
-	return digit;
-};
+	let firstNumber = null;
+	let secondNumber = null;
+	let operationType = null;
+	let isFirstDigit = true;
+	let isFirstNumberPriority = true;
 
-const writeDigit = () => {
-	if (isFirstDigit) {
-		isFirstDigit = false;
-		workField.value = '';
-	}
-	workField.value += getDigit(event);
-};
-
-const clear = () => {
-	workField.value = 0;
-	isFirstDigit = true;
-};
-
-const clearAll = () => {
-	workField.value = 0;
-	firstNumber = 0;
-	secondNumber = 0;
-	isFirstDigit = true;
-	isFirstNumberPriority = true;
-};
-
-numberButtons.forEach((num) => { 
-	num.addEventListener('click', getDigit);
-});
-
-numberButtons.forEach((num) => { 
-	num.addEventListener('click', writeDigit);
-});
-
-const getNumber = () => {
-	let number = null;
-	isFirstDigit = true;
-	console.log(value);
-	return number = +workField.value;
-};
-
-const writeNumber = () => {
-	console.log(isFirstNumberPriority);
-	if (isFirstNumberPriority) {
-		!firstNumber ? firstNumber = getNumber() : secondNumber = getNumber();
-	} else {
-		firstNumber = getNumber();
-	}
-	console.log(firstNumber + ' ' + secondNumber);
-};
-
-const getOperation = () => {
-	let {target: {dataset: {operation}}} = event;
-	operationType = operation;
-	console.log(operationType);
-	isFirstNumberPriority = true;
-	return operationType;
-};
-
-const sum = (a,b) => {
-	console.log(a+b);
-	return a + b;
-};
-
-const diff = (a,b) => {
-	return a - b;
-};
-
-const prod = (a,b) => {
-	return a * b;
-};
-
-const quotient = (a,b) => {
-	return a / b;
-};
-
-const changeSign = () => {
-	let number = +value;
-	number = 0 - number;
-	workField.value = number;
-
-}
-
-const getResult = () => {
-	getNumber();
-	writeNumber();
-	switch (operationType) {
-		case '+' : 
-			result = sum(firstNumber, secondNumber);	
-			break;
-		case '-' : 
-			result = diff(firstNumber, secondNumber);
-			break;
-		case '*' : 
-			result = prod(firstNumber, secondNumber);
-			break;
-		case '/' : 
-			result = quotient(firstNumber, secondNumber);
-			break;
-		default:
-			result = 'Error!';
+	const displayDigit = () => {
+		const getDigit = e => e.target.innerText;
+		if (isFirstDigit) {
+			isFirstDigit = false;
+			inputField.value = '';
+		}
+		inputField.value += getDigit(event);
 	};
-	isFirstNumberPriority = false;
-	return result;	
-};
 
-const writeResult = () => {
-	workField.value = result;
-};
+	const clear = () => {
+		if (event.target == clearAllButton) {
+			firstNumber = 0;
+			secondNumber = 0;
+			isFirstNumberPriority = true;
+		}
+		inputField.value = 0;
+		isFirstDigit = true;
+	};
 
-const initCalculator = () => {
+	const displayNumber = () => {
+		const getNumber = () => {
+			let {value} = inputField;
+			isFirstDigit = true;
+			return +value;
+		};
+		(isFirstNumberPriority && !firstNumber || !isFirstNumberPriority) ? firstNumber = getNumber() : secondNumber = getNumber();
+	};
+
+	const getOperation = () => {
+		let {target: {dataset: {operation}}} = event;
+		operationType = operation;
+		isFirstNumberPriority = true;
+	};
+
+	const changeSign = () => {
+		let number = +inputField.value;
+		number = -number;
+		inputField.value = number;
+	}
+
+	const getResult = () => {
+		displayNumber();
+		const sum = (a,b) => a + b;
+		const distract = (a,b) => a - b;
+		const multiply = (a,b) => a * b;
+		const divide = (a,b) => a / b;
+		const arithmetic = {
+			'+' : sum(firstNumber, secondNumber),
+			'-' : distract(firstNumber, secondNumber),
+			'*' : multiply(firstNumber, secondNumber),
+			'/' : divide(firstNumber, secondNumber),
+		}
+		isFirstNumberPriority = false;
+		return arithmetic[operationType];
+	};
+
+	const displayResult = () => {
+		inputField.value = getResult();
+	};
+
 	numberButtons.forEach((num) => { 
-		num.addEventListener('click', getDigit);
+		num.addEventListener('click', displayDigit);
 	});
  	operationButtons.forEach(operation => {
 		operation.addEventListener('click', getOperation);	
-	});
-	operationButtons.forEach(operation => {
-		operation.addEventListener('click', getNumber);	
-	});
-	operationButtons.forEach(operation => {
-		operation.addEventListener('click', writeNumber);	
+		operation.addEventListener('click', displayNumber);	
 	});
 	plusMinus.addEventListener('click', changeSign);
-	resultButton.addEventListener('click', getResult);
-	resultButton.addEventListener('click', writeResult);
+	resultButton.addEventListener('click', displayResult);
 	clearButton.addEventListener('click', clear);
-	clearAllButton.addEventListener('click', clearAll);
+	clearAllButton.addEventListener('click', clear);
 };
 
 initCalculator();
-    
